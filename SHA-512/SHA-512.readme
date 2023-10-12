@@ -1,0 +1,129 @@
+Implementation of SHA-512
+
+
+Description
+
+This is a simple implementation of SHA-512 in Python.
+
+What is SHA-512
+
+SHA-512, short for Secure Hash Algorithm 512-bit, is a cryptographic hash function that takes an input message and produces a fixed-size output hash value (512 bits or 64 bytes). It is designed to be a one-way function, meaning it is computationally infeasible to reverse the process and obtain the original input from the hash value. SHA-512 is widely used for data integrity verification, password storage, digital signatures, and various security applications where ensuring data integrity and authenticity is crucial.
+
+
+Algorithm
+
+Get the input message from the user.
+Encode the input message with `UTF-8`
+Add the padding bits as per necessity.
+Now, divide the message in `N \* 1024` blocks if the length of message >= 896.
+Initialize the constant K and HASH_VALUE
+For every block of input apply the `compression_function()`
+The final hash value will be stored in the HASH_VALUE constant. This value will be used as seed for hashing another message.
+
+
+SHA-512 Hashing Algorithm Documentation
+ 
+1. Constants and Initial Hash Values
+
+K: This list contains constant values (64-bit words) used in the SHA-512 compression function. These values are used in the message schedule during the hashing process.
+
+HASH_VALUE: This list contains the initial hash values (64-bit words) used in the SHA-512 algorithm. These values are the first eight prime numbers' fractional parts (in hexadecimal representation) square roots.
+
+2. Utility Functions
+2.1. rotr(x, n)
+Description: Performs a right circular shift operation on the 64-bit input x by n bits.
+Parameters:
+x: 64-bit input value.
+n: Number of bits to shift.
+Returns: The result of the right circular shift operation.
+
+2.2. addition_modulo_2_64(value)
+Description: Performs addition modulo 264264 on the input value.
+Parameters:
+value: Value to perform the modulo operation on.
+Returns: The result of the addition modulo 264264.
+
+2.3. pad_message(message)
+Description: Pads the input message according to the SHA-512 padding scheme.
+Parameters:
+message: The input message to be padded.
+Returns: The padded message in bytes.
+
+2.4. divide_to_blocks(message)
+Description: Divides the padded message into 128-byte (64-bit) blocks.
+Parameters:
+message: The padded message in bytes.
+Returns: A list of 128-byte blocks.
+
+3. SHA-512 Compression Functions
+3.1. Ch(e, f, g)
+Description: Computes the Ch(x, y, z) function used in the SHA-512 compression function.
+Parameters:
+e, f, g: 64-bit input values.
+Returns: The result of Ch(x, y, z).
+
+3.2. Maj(a, b, c)
+Description: Computes the Maj(x, y, z) function used in the SHA-512 compression function.
+Parameters:
+a, b, c: 64-bit input values.
+Returns: The result of Maj(x, y, z).
+
+3.3. sigma_0(word)
+Description: Computes the sigma_0 function used in the SHA-512 compression function.
+Parameters:
+word: 64-bit input word.
+Returns: The result of sigma_0 function.
+
+3.4. sigma_1(word)
+Description: Computes the sigma_1 function used in the SHA-512 compression function.
+Parameters:
+word: 64-bit input word.
+Returns: The result of sigma_1 function.
+
+3.5. compression_function(message)
+Description: Implements the SHA-512 compression function.
+Parameters:
+message: A 128-byte (64-bit) block of the padded message.
+
+Working:
+Initializes eight working variables (a to h) with the initial hash values.
+Processes the block in 80 rounds, updating the working variables using various logical and arithmetic operations.
+Updates the intermediate hash values (HASH_VALUE) after each round.
+Note: The K constants are used during the rounds, and the functions Ch, Maj, sigma_0, and sigma_1 are applied based on the SHA-512 algorithm specifications.
+
+4. Main Code Flow
+Input: Accepts a message from the user encoded in UTF-8.
+Padding: The input message is padded using the pad_message function.
+Block Division: The padded message is divided into 128-byte blocks using the divide_to_blocks function.
+Processing: Each block is processed using the compression_function, updating the HASH_VALUE.
+Output: After processing all blocks, the final SHA-512 hash value is calculated and displayed to the user.
+
+
+SHA-15 Compression Function
+for t in range(16):
+    W[t] = int.from_bytes(message[t * 8 : (t + 1) * 8], byteorder="big")
+for t in range(16, 80):
+    W[t] = sigma_1(W[t - 2] + W[t - 7]) + sigma_0(W[t - 15] + W[t - 16])
+The first loop calculates W0 - W15. The second loop calculates W16 - W79.
+for t in range(80):
+    T1 = h + (Ch(e, f, g) + (rotr(e, 14) ^ rotr(e, 18) ^ rotr(e, 41)) + K[t] + W[t])
+    T2 = (rotr(a, 28) ^ rotr(a, 34) ^ rotr(a, 39)) + Maj(a, b, c)
+
+    h = g
+    g = f
+    f = e
+    e = addition_modulo_2_64(d + T1)
+    d = c
+    c = b
+    b = a
+    a = addition_modulo_2_64(T1 + T2)
+#intermediate Hash valuesHASH_VALUE[0] = addition_modulo_2_64(HASH_VALUE[0] + a)HASH_VALUE[1] = addition_modulo_2_64(HASH_VALUE[1] + b)HASH_VALUE[2] = addition_modulo_2_64(HASH_VALUE[2] + c)HASH_VALUE[3] = addition_modulo_2_64(HASH_VALUE[3] + d)HASH_VALUE[4] = addition_modulo_2_64(HASH_VALUE[4] + e)HASH_VALUE[5] = addition_modulo_2_64(HASH_VALUE[5] + f)HASH_VALUE[6] = addition_modulo_2_64(HASH_VALUE[6] + g)HASH_VALUE[7] = addition_modulo_2_64(HASH_VALUE[7] + h)
+
+The compression_function is the core of the SHA-512 hashing process. It takes a 128-byte message block as input and updates the HASH_VALUE accordingly.
+
+
+USAGE
+
+Input a message after running the program.
+The code pads the message, divides it into blocks, and initiates the SHA-512 hashing process.
+The final 512-bit (128-byte) hash value is printed as a hexadecimal string.
